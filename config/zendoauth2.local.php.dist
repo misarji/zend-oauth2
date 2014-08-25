@@ -1,0 +1,25 @@
+<?php
+return array(
+    'zendoauth2' => array(
+        'google' => array(
+            'client_id'     => 'your id',
+            'client_secret' => 'your secret',
+            'redirect_uri'  => 'your callback url which links to your controller',
+        ),
+        'github' => array(
+            'client_id'     => 'your id',
+            'client_secret' => 'your secret',
+            'redirect_uri'  => 'your callback url which links to your controller',
+        ),
+        'facebook' => array(
+            'client_id'     => 'your id',
+            'client_secret' => 'your secret',
+            'redirect_uri'  => 'your callback url which links to your controller',
+        ),
+        'linkedin' => array(
+            'client_id'     => 'your api key',
+            'client_secret' => 'your api secret',
+            'redirect_uri'  => 'your callback url which links to your controller',
+        ),
+    )
+);

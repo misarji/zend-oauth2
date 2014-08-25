@@ -1,0 +1,15 @@
+<phpunit bootstrap="Bootstrap.php" colors="true">
+	<testsuites>
+		<testsuite name="ZendOAuth2 Module Tests">
+			<directory>./ZendOAuth2Test</directory>
+		</testsuite>
+	</testsuites>
+	<filter>
+		<whitelist processUncoveredFilesFromWhitelist="true">
+			<directory suffix=".php">../</directory>
+			<exclude>
+			    <directory suffix=".php">../tests</directory>
+			</exclude>
+		</whitelist>
+	</filter>
+</phpunit>
