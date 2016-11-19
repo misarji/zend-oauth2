@@ -1,7 +1,13 @@
-ZendOAuth2
+ZendOAuth2 v1.1
 ===========
 
-Great OAuth2 client for ZF2. It provides clients for github, google, facebook and linkedin, others are coming soon. 
+## Update 1.1
+
+----------
+
+- Added new method setScopeFields() and getScopeFields() that allow retrieve the user info from the FB graph app newest version.
+
+Great OAuth2 client for ZF2. It provides clients for github, google, facebook and linkedin, others are coming soon.
 
 The library is kept as simple as possible, it does not provide routes or controllers.
 
@@ -36,7 +42,7 @@ Usage
 
 As usual add it to your application.config.php 'ZendOAuth2'.
 
-Copy & rename the `config/zendoauth2.local.php.dist` to your autoload folder and fill the information needed. 
+Copy & rename the `config/zendoauth2.local.php.dist` to your autoload folder and fill the information needed.
 
 ### In your controller/action do:
 ```php
@@ -49,19 +55,19 @@ public function callbackAction()
     //$me = $this->getServiceLocator()->get('ZendOAuth2\LinkedIn');
 
     if (strlen($this->params()->fromQuery('code')) > 10) {
-    	
+
     	if($me->getToken($this->request)) {
     		$token = $me->getSessionToken(); // token in session
     	} else {
     		$token = $me->getError(); // last returned error (array)
     	}
-        
+
         $info = $me->getInfo();
-        
+
     } else {
-    
+
         $url = $me->getUrl();
-        
+
     }
 
     return array('token' => $token, 'info' => $info, 'url' => $url);
@@ -84,7 +90,10 @@ public function callbackAction()
     //$me = $this->getServiceLocator()->get('ZendOAuth2\Facebook');
     //$me = $this->getServiceLocator()->get('ZendOAuth2\LinkedIn');
 
-	$me->getOptions()->setScope(array('email', 'user'));
+  // Set the required scope access
+  $me->getOptions()->setScope(array('email', 'public_profile', 'user_location'));
+  // Set the fields to read from the FB user
+  $me->getOptions()->setScopeFields(array('id', 'email', 'name'));
 	$me->getOptions()->setAuthUri('http://google.com/');
 	$me->getOptions()->setTokenUri('http://google.com/');
 	$me->getOptions()->setInfoUri('http://google.com/');
@@ -106,19 +115,19 @@ public function authGithubAction() // controller action
     $me = $this->getServiceLocator()->get('ZendOAuth2\Github');
 
     $auth = new AuthenticationService(); // zend
-    
+
     if (strlen($this->params()->fromQuery('code')) > 10) {
-         
+
         if($me->getToken($this->request)) { // if getToken is true, the user has authenticated successfully by the provider, not yet by us.
             $token = $me->getSessionToken(); // token in session
         } else {
             $token = $me->getError(); // last returned error (array)
         }
-        
+
         $adapter = $this->getServiceLocator()->get('ZendOAuth2\Auth\Adapter'); // added in module.config.php
         $adapter->setOAuth2Client($me); // $me is the oauth2 client
         $rs = $auth->authenticate($adapter); // provides an eventManager 'oauth2.success'
-        
+
         if (!$rs->isValid()) {
             foreach ($rs->getMessages() as $message) {
                 echo "$message\n";
@@ -133,7 +142,7 @@ public function authGithubAction() // controller action
     }
 
     $view = new ViewModel(array('token' => $token, 'info' => $info, 'url' => $url, 'error' => $me->getError()));
-    
+
     return $view;
 
 }
@@ -152,20 +161,20 @@ public function onBootstrap(Event $e)
     $e->getApplication()->getServiceManager()->get('ZendOAuth2\Auth\Adapter')->getEventManager() // the the adapters eventmanager
         ->attach('oauth2.success', //attach to the event
             function($e) use ($userTable){
-                
+
                 $params = $e->getParams(); //print_r($params); so you see whats in if
-                
+
                 if($user = $userTable->getUserByRemote($params['provider'], $params['info']['id'])) { // check for user from facebook with id 1000
-    
+
                     $user->token = $params['token']['access_token'];
                     $expire = (isset($params['token']['expires'])) ? $params['token']['expires'] : 3600;
                     $user->token_valid = new \Zend\Db\Sql\Expression('DATE_ADD(NOW(), INTERVAL '.$expire.' SECOND)');
                     $user->date_update = new \Zend\Db\Sql\Expression('NOW()');
-                    
+
                     $userTable->saveUser($user);
-                                    
+
                 } else {
-                    
+
                     $user = new User;
                     $user->token = $params['token']['access_token'];
                     $expire = (isset($params['token']['expires'])) ? $params['token']['expires'] : 3600;
@@ -176,19 +185,19 @@ public function onBootstrap(Event $e)
                     $user->remote_id = $params['info']['id'];
                     $user->name = $params['info']['name'];
                     $user->info = \Zend\Json\Encoder::encode($params['info']);
-                    
+
                     $userTable->saveUser($user);
-                    
+
                 }
-                
+
                 $user = $userTable->getUserByRemote($params['provider'], $params['info']['id']);
                 $params['info'] = $user->getArrayCopy();
                 $params['info']['info'] = false;
-    
+
     			// here the params info is rewitten. The result object returned from the auth object will have the db row.
-    			
+
     			$params['code'] = \Zend\Authentication\Result::FAILURE; // this would deny authentication. default is \Zend\Authentication\Result::SUCCESS.
-    
+
             });
 
 }

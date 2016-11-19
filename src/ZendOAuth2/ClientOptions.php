@@ -9,6 +9,8 @@ class ClientOptions extends AbstractOptions
 
     protected $scope;
 
+    protected $scopeFields;
+
     protected $authUri;
 
     protected $tokenUri;
@@ -21,7 +23,7 @@ class ClientOptions extends AbstractOptions
 
     protected $redirectUri;
 
-    
+
     public function getScope()
     {
         return $this->scope;
@@ -30,6 +32,16 @@ class ClientOptions extends AbstractOptions
     public function setScope($scope)
     {
         $this->scope = $scope;
+    }
+
+    public function getScopeFields()
+    {
+        return $this->scopeFields;
+    }
+
+    public function setScopeFields($fields)
+    {
+        $this->scopeFields = $fields;
     }
 
     public function getAuthUri()
