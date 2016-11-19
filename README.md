@@ -1,5 +1,11 @@
-ZendOAuth2
+ZendOAuth2 v1.1
 ===========
+
+## Update 1.1
+
+----------
+
+- Added new method setScopeFields() and getScopeFields() that allow retrieve the user info from the FB graph app newest version.
 
 Great OAuth2 client for ZF2. It provides clients for github, google, facebook and linkedin, others are coming soon.
 
